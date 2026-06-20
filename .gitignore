@@ -4,3 +4,5 @@ client/uploads/*
 !client/uploads/.gitkeep
 img/
 *.log
+nul
+DOCUMENTACION.md

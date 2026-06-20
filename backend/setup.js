@@ -1,15 +1,16 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
 async function setup() {
   const conn = await mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'stiven30032007.',
+    password: process.env.DB_PASSWORD,
   });
 
   await conn.query('CREATE DATABASE IF NOT EXISTS snackzone');
-  await conn.query('USE snackzone');  
+  await conn.query('USE snackzone');
 
   await conn.query(`
     CREATE TABLE IF NOT EXISTS productos (
@@ -23,6 +24,23 @@ async function setup() {
       imagen VARCHAR(255),
       stock INT DEFAULT 0,
       activo BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await conn.query(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE,
+      password_hash VARCHAR(255),
+      google_id VARCHAR(255) UNIQUE,
+      avatar VARCHAR(255),
+      telefono VARCHAR(20),
+      direccion TEXT,
+      rol VARCHAR(20) DEFAULT 'usuario',
+      aprobado BOOLEAN DEFAULT FALSE,
+      aprobado_por INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -70,21 +88,6 @@ async function setup() {
   `);
 
   await conn.query(`
-    CREATE TABLE IF NOT EXISTS usuarios (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      nombre VARCHAR(100) NOT NULL,
-      email VARCHAR(100) NOT NULL UNIQUE,
-      password_hash VARCHAR(255),
-      google_id VARCHAR(255) UNIQUE,
-      avatar VARCHAR(255),
-      telefono VARCHAR(20),
-      direccion TEXT,
-      rol VARCHAR(20) DEFAULT 'usuario',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await conn.query(`
     CREATE TABLE IF NOT EXISTS cupones (
       id INT AUTO_INCREMENT PRIMARY KEY,
       codigo VARCHAR(50) NOT NULL UNIQUE,
@@ -124,30 +127,29 @@ async function setup() {
     )
   `);
 
-  try { await conn.query('ALTER TABLE productos ADD COLUMN imagen VARCHAR(255)'); } catch (e) { console.log('migrate imagen:', e.message); }
-  try { await conn.query('ALTER TABLE productos ADD COLUMN stock INT DEFAULT 0'); } catch (e) { console.log('migrate stock:', e.message); }
-  try { await conn.query('ALTER TABLE pedidos ADD COLUMN usuario_id INT'); } catch (e) { console.log('migrate usuario_id:', e.message); }
-  try { await conn.query('ALTER TABLE pedidos ADD COLUMN descuento INT DEFAULT 0'); } catch (e) { console.log('migrate descuento:', e.message); }
-  try { await conn.query('ALTER TABLE pedidos ADD COLUMN cupon_id INT'); } catch (e) { console.log('migrate cupon_id:', e.message); }
-  try { await conn.query('ALTER TABLE pedidos ADD COLUMN codigo_seguimiento VARCHAR(20) UNIQUE'); } catch (e) { console.log('migrate codigo_seguimiento:', e.message); }
-  try { await conn.query('ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) UNIQUE'); } catch (e) { console.log('migrate google_id:', e.message); }
-  try { await conn.query('ALTER TABLE usuarios ADD COLUMN avatar VARCHAR(255)'); } catch (e) { console.log('migrate avatar:', e.message); }
-  try { await conn.query('ALTER TABLE usuarios ADD COLUMN telefono VARCHAR(20)'); } catch (e) { console.log('migrate telefono:', e.message); }
-  try { await conn.query('ALTER TABLE usuarios ADD COLUMN direccion TEXT'); } catch (e) { console.log('migrate direccion:', e.message); }
-  try { await conn.query('ALTER TABLE usuarios MODIFY COLUMN password_hash VARCHAR(255) NULL'); } catch (e) { console.log('migrate password_hash:', e.message); }
-  try { await conn.query("ALTER TABLE usuarios ADD COLUMN aprobado BOOLEAN DEFAULT FALSE"); } catch (e) { console.log('migrate aprobado:', e.message); }
-  try { await conn.query("ALTER TABLE usuarios ADD COLUMN aprobado_por INT"); } catch (e) { console.log('migrate aprobado_por:', e.message); }
-  try { await conn.query("UPDATE usuarios SET aprobado = TRUE WHERE rol IN ('admin','vendedor','usuario')"); } catch (e) { console.log('actualizar aprobados:', e.message); }
-
   const bcrypt = require('bcryptjs');
   const [userRows] = await conn.query('SELECT COUNT(*) as count FROM usuarios');
   if (userRows[0].count === 0) {
-    const hash = await bcrypt.hash('admin123', 10);
+    const hashAdmin = await bcrypt.hash('admin123', 10);
     await conn.query(
-      'INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES (?, ?, ?, ?)',
-      ['Admin', 'admin@snackzone.com', hash, 'admin']
+      'INSERT INTO usuarios (nombre, email, password_hash, rol, aprobado) VALUES (?, ?, ?, ?, ?)',
+      ['Admin', 'admin@snackzone.com', hashAdmin, 'admin', true]
     );
     console.log('Usuario admin creado: admin@snackzone.com / admin123');
+
+    const hashVendedor = await bcrypt.hash('vendedor123', 10);
+    await conn.query(
+      'INSERT INTO usuarios (nombre, email, password_hash, rol, aprobado) VALUES (?, ?, ?, ?, ?)',
+      ['Vendedor', 'vendedor@test.com', hashVendedor, 'vendedor', false]
+    );
+    console.log('Usuario vendedor creado: vendedor@test.com / vendedor123');
+
+    const hashUsuario = await bcrypt.hash('usuario123', 10);
+    await conn.query(
+      'INSERT INTO usuarios (nombre, email, password_hash, rol, aprobado) VALUES (?, ?, ?, ?, ?)',
+      ['Usuario', 'usuario@test.com', hashUsuario, 'usuario', true]
+    );
+    console.log('Usuario cliente creado: usuario@test.com / usuario123');
   }
 
   const [rows] = await conn.query('SELECT COUNT(*) as count FROM productos');

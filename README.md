@@ -19,13 +19,10 @@ cd backend
 # 2. Instalar dependencias (solo la primera vez)
 npm install
 
-# 3. Crear la base de datos en MySQL
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS snackzone"
-
-# 4. Crear tablas y datos de prueba (solo la primera vez)
+# 3. Crear tablas y datos de prueba (solo la primera vez)
 npm run setup
 
-# 5. Iniciar el servidor
+# 4. Iniciar el servidor
 npm start
 ```
 
@@ -469,7 +466,7 @@ ngrok http 3008
 | Problema | Solución |
 |----------|----------|
 | "No se conecta a MySQL" | Abre "Servicios" de Windows y asegúrate que "MySQL80" esté en ejecución |
-| "Base de datos no existe" | `mysql -u root -p -e "CREATE DATABASE snackzone"` |
+| "Base de datos no existe" | Ejecuta `npm run setup` en la carpeta `backend/` (crea la BD automáticamente) |
 | "Table doesn't exist" | Ejecuta `npm run setup` en la carpeta `backend/` |
 | Error `products is not defined` | El servidor necesita reiniciarse después de crear las tablas |
 | Token inválido o expirado | Vuelve a iniciar sesión |
@@ -488,3 +485,123 @@ ngrok http 3008
 bcryptjs, express, express-session, jsonwebtoken, multer,
 mysql2, nodemailer, passport, passport-google-oauth20, uuid
 ```
+
+### Backend — Paquetes de Node (`backend/package.json`)
+
+| Paquete | ¿Pa' qué sirve en este proyecto? |
+|---|---|
+| `bcryptjs` | Encripta las contraseñas antes de guardarlas en la BD y las compara al iniciar sesión. Así nadie puede ver la contraseña original |
+| `dotenv` | Lee el archivo `.env` con datos privados (contraseña de MySQL, JWT secret, credenciales de Gmail y Google) y los pone disponibles en el servidor |
+| `express` | El motor del servidor web. Crea las rutas (`/api/productos`, `/api/pedidos`, etc.), procesa las peticiones y sirve los archivos del frontend |
+| `express-session` | Guarda una sesión temporal en el servidor. Se necesita para que funcione el inicio de sesión con Google |
+| `jsonwebtoken` | Crea un "carnet digital" (token) al iniciar sesión. Ese token se envía en cada petición pa' que el servidor sepa quién sos sin pedir la contraseña a cada rato. Dura 24 horas |
+| `multer` | Recibe las fotos que se suben de productos, las valida (solo jpg/png/gif/webp, máximo 5MB) y las guarda en `client/uploads/` |
+| `mysql2` | El puente entre Node.js y MySQL. Todas las consultas a la base de datos pasan por este paquete |
+| `nodemailer` | Manda correos. Se usa pa' enviar el correo de bienvenida a los vendedores cuando el admin los aprueba |
+| `passport` | El portero de la app. Maneja la autenticación. En este proyecto se usa solo pa' el inicio de sesión con Google |
+| `passport-google-oauth20` | Permite iniciar sesión con tu cuenta de Google. Crea un usuario en la BD si es la primera vez que entrás |
+| `uuid` | Genera nombres únicos pa' las fotos que se suben. Así aunque dos usuarios suban una foto llamada `foto.jpg`, se guardan con nombres distintos |
+
+### Cliente — Recursos desde internet (CDN)
+
+| Recurso | ¿Pa' qué sirve en este proyecto? |
+|---|---|
+| **Font Awesome** | Los iconos que ves por toda la página: carrito de compras, corazón de favoritos, lupa de búsqueda, logo de Google, WhatsApp, estrellas, menú, etc. |
+| **Chart.js** | Hace los gráficos del panel admin: el gráfico de barras de productos por categoría y el de dona de productos con stock vs agotados |
+| **UI Avatars** (API) | Crea una foto de perfil automática con las iniciales del usuario cuando no tiene imagen propia. Es una API externa gratuita |
+
+---
+
+### 🔌 ¿Cómo se conecta el servidor con MySQL?
+
+**Express no se conecta a MySQL.** Express es solo el cartero que recibe y responde pedidos web. El que habla con MySQL es **Node.js** a través del paquete `mysql2`.
+
+**Cadena completa cuando entrás a la tienda:**
+
+```
+Tu navegador
+    ↓  http://localhost:3000/api/productos
+Express (servidor web) — recibe el pedido
+    ↓
+routes/productos.js — agarra el pool de db.js
+    ↓
+mysql2 — ejecuta: SELECT * FROM productos WHERE activo = TRUE
+    ↓
+MySQL — busca los datos y los devuelve
+    ↓
+mysql2 — se los pasa a la ruta
+    ↓
+Express — los envía como JSON al navegador
+    ↓
+app.js (frontend) — los pinta en pantalla
+```
+
+**`db.js` crea un pool de conexiones:**
+```js
+const pool = mysql.createPool({
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: process.env.DB_PASSWORD,
+  database: 'snackzone'
+});
+```
+Ese pool lo importan todas las rutas. El pool mantiene hasta 10 conexiones abiertas pa' no estar conectándose y desconectándose a cada rato.
+
+---
+
+### 🧠 ¿Cómo "escucha" el servidor en un puerto?
+
+Cuando en `servidor.js` ponés:
+```js
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
+```
+Esto es lo que pasa por dentro:
+
+1. **Node.js** le pide al sistema operativo (Windows): "quiero usar el puerto 3000"
+2. El **SO** reserva ese puerto exclusivamente para este proceso Node
+3. Node crea un **socket TCP** que se queda escuchando permanentemente
+4. Cuando alguien escribe `http://localhost:3000` en el navegador:
+   - El navegador abre una conexión TCP a tu PC en el puerto 3000
+   - Node recibe la conexión, la envuelve en un objeto `req` (request) y `res` (response)
+   - Express examina la URL y se la manda al router que corresponda
+   - El router ejecuta la lógica y devuelve la respuesta
+5. Node **no se queda bloqueado** esperando — mientras atiende un pedido, puede seguir recibiendo otros. Eso es el **event loop** de Node.js
+
+Si el puerto ya está ocupado (ej: ya tenés otro server corriendo), tira error `EADDRINUSE` y el programa se cae.
+
+---
+
+### 🛠️ ¿Qué hubo que hacer para crear este servidor desde cero?
+
+Así como `git init` crea un repositorio, esto fue lo que se hizo para arrancar el proyecto:
+
+| Paso | Comando / Acción | ¿Qué hace? |
+|---|---|---|
+| **1** | `npm init -y` dentro de `backend/` | Crea el `package.json` (como el `git init` pero para Node) |
+| **2** | `npm install express mysql2 bcryptjs jsonwebtoken dotenv express-session passport passport-google-oauth20 multer nodemailer uuid` | Descarga todos los paquetes en `node_modules/` y los guarda en `package.json` |
+| **3** | Crear `servidor.js` | Archivo principal que importa Express, configura middlewares, monta las rutas y llama a `app.listen()` |
+| **4** | Crear `db.js` | Archivo que crea el pool de conexión a MySQL usando `mysql2` |
+| **5** | Crear `.env` (basado en `.env.example`) | Guarda datos sensibles: contraseña MySQL, secretos JWT, credenciales Google y Gmail |
+| **6** | Crear `backend/routes/` | Cada archivo define un grupo de rutas (productos, pedidos, auth, etc.) |
+| **7** | Crear `backend/middleware/auth.js` | Funciones pa' generar y verificar tokens JWT |
+| **8** | `npm run setup` (ejecuta `setup.js`) | Crea la base de datos `snackzone`, todas las tablas y mete datos de prueba (25 productos, 3 usuarios, 1 cupón) |
+| **9** | `npm start` (ejecuta `node servidor.js`) | Arranca el servidor y lo deja escuchando en el puerto |
+
+**Archivos importantes que se crearon a mano:**
+
+| Archivo | Lo creaste para... |
+|---|---|
+| `backend/servidor.js` | El punto de entrada: levanta Express, conecta todo |
+| `backend/db.js` | Configurar la conexión a MySQL |
+| `backend/setup.js` | Crear BD, tablas y datos de prueba automáticamente |
+| `backend/.env` | Guardar contraseñas y claves secretas |
+| `backend/.gitignore` | Para no subir `node_modules/`, `.env` ni `uploads/` a Git |
+| `backend/routes/*.js` | Definir cada grupo de endpoints de la API |
+| `backend/middleware/auth.js` | Proteger rutas con JWT |
+| `backend/config/email.js` | Configurar el envío de correos |
+| `backend/services/emailService.js` | La lógica pa' mandar el correo de aprobación |
+| `client/` (todo) | El frontend: HTML, CSS, JavaScript, imágenes |
+| `README.md` | Documentar el proyecto |
