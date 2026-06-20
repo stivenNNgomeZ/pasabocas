@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnackZone - Pasabocas Colombia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div id="app">
+
+    <header id="header">
+      <div class="container header-content">
+        <a href="#" class="logo" onclick="scrollToTop()">
+          <i class="fas fa-cookie-bite"></i> SnackZone
+        </a>
+        <nav class="nav-links" id="nav-links">
+          <a href="#" class="nav-link active" data-page="catalogo" onclick="cambiarPagina('catalogo')"><i class="fas fa-th"></i> Catálogo</a>
+          <a href="#" class="nav-link" data-page="pedidos" onclick="cambiarPagina('pedidos')"><i class="fas fa-box-open"></i> Mis Pedidos</a>
+          <a href="#" class="nav-link" data-page="perfil" onclick="cambiarPagina('perfil')"><i class="fas fa-user"></i> Perfil</a>
+          <a href="admin.html" class="nav-link admin-link" id="nav-admin-link" style="display:none"><i class="fas fa-shield-alt"></i> Panel</a>
+          <a href="#" onclick="cerrarSesion(); return false;" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i></a>
+          <a href="#carrito" class="cart-btn" onclick="abrirCarrito(event)">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </nav>
+        <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============ PÁGINA: CATÁLOGO ============ -->
+    <div class="pagina active" id="pagina-catalogo">
+
+      <section class="hero">
+        <div class="hero-bg-pattern"></div>
+        <div class="container hero-content" style="justify-content:center;text-align:center">
+          <div class="hero-text" style="max-width:600px">
+            <span class="hero-badge">🔥 Pasabocas Colombia</span>
+            <h1>Los mejores <span class="highlight">pasabocas</span> de la ciudad</h1>
+            <p>Variedad, sabor y calidad en cada bocado. Hacemos tus antojos realidad con entrega rápida.</p>
+            <div class="hero-buttons" style="justify-content:center">
+              <a href="#catalogo" class="btn btn-primary">
+                <i class="fas fa-th"></i> Ver Catálogo
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-bar">
+        <div class="container stats-grid">
+          <div class="stat-item">
+            <span class="stat-num" id="stats-products">50+</span>
+            <span class="stat-label">Productos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">100%</span>
+            <span class="stat-label">Satisfacción</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">Entrega</span>
+            <span class="stat-label">Rápida y segura</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">Pago</span>
+            <span class="stat-label">Contraentrega</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="catalogo" class="section catalogo">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle">Nuestros productos</span>
+            <h2 class="section-title">Catálogo de Pasabocas</h2>
+            <p class="section-desc">Encuentra todo lo que necesitas para tus momentos especiales</p>
+          </div>
+          <div class="catalogo-controls">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="search-input" placeholder="Buscar productos..." oninput="buscarProductos(this.value)">
+            </div>
+            <div class="filtros" id="filtros">
+              <button class="filtro-btn active" data-categoria="todas">Todas</button>
+              <button class="filtro-btn" data-categoria="salados">Salados</button>
+              <button class="filtro-btn" data-categoria="dulces">Dulces</button>
+              <button class="filtro-btn" data-categoria="bebidas">Bebidas</button>
+              <button class="filtro-btn" data-categoria="extras">Extras</button>
+            </div>
+          </div>
+          <div class="productos-grid" id="productos-grid"></div>
+          <div class="productos-empty" id="productos-empty" style="display:none">
+            <i class="fas fa-search"></i>
+            <p>No encontramos productos con ese nombre</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto-catalogo" class="section contacto">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle">Contáctanos</span>
+            <h2 class="section-title">Estamos para servirte</h2>
+          </div>
+          <div class="contacto-grid">
+            <div class="contacto-info">
+              <div class="contacto-item">
+                <i class="fab fa-whatsapp"></i>
+                <div>
+                  <h4>WhatsApp</h4>
+                  <a href="https://wa.me/573001234567" target="_blank">+57 300 123 4567</a>
+                </div>
+              </div>
+              <div class="contacto-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <h4>Ubicación</h4>
+                  <p>Bogotá, Colombia</p>
+                </div>
+              </div>
+              <div class="contacto-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                  <h4>Horarios</h4>
+                  <p>Lun - Sáb: 9am - 8pm</p>
+                </div>
+              </div>
+              <div class="contacto-item">
+                <i class="fas fa-credit-card"></i>
+                <div>
+                  <h4>Medios de pago</h4>
+                  <p>Efectivo, Nequi, DaviPlata, Bancolombia</p>
+                </div>
+              </div>
+            </div>
+            <form class="contacto-form" id="contact-form" onsubmit="enviarContacto(event)">
+              <h3>Escríbenos</h3>
+              <input type="text" placeholder="Tu nombre" required>
+              <input type="email" placeholder="Tu email" required>
+              <textarea placeholder="Tu mensaje" rows="4" required></textarea>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Enviar mensaje
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="container footer-content">
+          <div class="footer-brand">
+            <h3><i class="fas fa-cookie-bite"></i> SnackZone</h3>
+            <p>Pasabocas con amor para Colombia</p>
+          </div>
+          <div class="footer-links">
+            <h4>Links</h4>
+            <a href="#" onclick="cambiarPagina('catalogo')">Catálogo</a>
+            <a href="#" onclick="cambiarPagina('catalogo'); setTimeout(()=>document.getElementById('contacto-catalogo').scrollIntoView({behavior:'smooth'}),100)">Contacto</a>
+          </div>
+          <div class="footer-social">
+            <h4>Síguenos</h4>
+            <div class="social-links">
+              <a href="#" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+              <a href="#" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="container">
+            <p>&copy; 2026 SnackZone. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- ============ PÁGINA: MIS PEDIDOS ============ -->
+    <div class="pagina" id="pagina-pedidos">
+      <div class="page-banner" style="background:linear-gradient(135deg,#2d3436,#636e72)">
+        <div class="container">
+          <div class="page-banner-content">
+            <div class="page-banner-icon"><i class="fas fa-box-open"></i></div>
+            <div>
+              <h1>Mis Pedidos</h1>
+              <p>Historial completo de tus órdenes en SnackZone</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container">
+          <div class="pedidos-stats-grid" id="pedidos-stats"></div>
+          <div class="pedidos-search">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="pedidos-search-input" placeholder="Buscar por código, producto, estado..." oninput="filtrarPedidos(this.value)">
+          </div>
+          <div id="mis-pedidos-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PÁGINA: PERFIL ============ -->
+    <div class="pagina" id="pagina-perfil">
+      <div class="page-banner" style="background:linear-gradient(135deg,var(--primary),var(--secondary))">
+        <div class="container">
+          <div class="page-banner-content">
+            <div class="page-banner-icon"><i class="fas fa-user-circle"></i></div>
+            <div>
+              <h1>Mi Perfil</h1>
+              <p>Administra tu cuenta y datos personales</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container perfil-layout">
+          <div class="perfil-sidebar">
+            <div class="perfil-card-compact">
+              <img id="perfil-avatar" class="perfil-avatar" src="https://ui-avatars.com/api/?name=Usuario&background=ff6b35&color=fff&size=128" alt="Avatar">
+              <h3 id="perfil-nombre-display"></h3>
+              <p id="perfil-email"></p>
+              <span class="badge badge-pago" id="perfil-rol"></span>
+              <p style="font-size:12px;margin-top:8px;color:var(--gray)" id="perfil-miembro"></p>
+            </div>
+            <div class="perfil-nav">
+              <button class="perfil-nav-btn active" data-ptab="info" onclick="cambiarPestanaPerfil('info')">
+                <i class="fas fa-user-edit"></i> Información
+              </button>
+              <button class="perfil-nav-btn" data-ptab="password" onclick="cambiarPestanaPerfil('password')">
+                <i class="fas fa-lock"></i> Contraseña
+              </button>
+              <button class="perfil-nav-btn" data-ptab="delete" onclick="cambiarPestanaPerfil('delete')">
+                <i class="fas fa-trash-alt"></i> Eliminar cuenta
+              </button>
+            </div>
+          </div>
+          <div class="perfil-main">
+            <div class="perfil-section-card active" id="perfil-info-section">
+              <div class="perfil-section-header">
+                <i class="fas fa-user-circle"></i>
+                <h3>Información Personal</h3>
+              </div>
+              <form onsubmit="guardarPerfil(); return false">
+                <div class="form-group">
+                  <label><i class="fas fa-user"></i> Nombre completo</label>
+                  <input type="text" id="perfil-nombre" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-phone"></i> Teléfono</label>
+                  <input type="tel" id="perfil-telefono" placeholder="Ej: 3001234567">
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                  <textarea id="perfil-direccion" rows="3" placeholder="Tu dirección de entrega"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="fas fa-save"></i> Guardar cambios
+                </button>
+              </form>
+            </div>
+            <div class="perfil-section-card" id="perfil-password-section">
+              <div class="perfil-section-header">
+                <i class="fas fa-key"></i>
+                <h3>Cambiar Contraseña</h3>
+              </div>
+              <form onsubmit="cambiarPassword(event)">
+                <div class="form-group">
+                  <label><i class="fas fa-lock"></i> Contraseña actual</label>
+                  <input type="password" id="pass-actual" required placeholder="Ingresa tu contraseña actual">
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-key"></i> Nueva contraseña</label>
+                  <input type="password" id="pass-nueva" required placeholder="Mínimo 6 caracteres" minlength="6">
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-check-circle"></i> Confirmar contraseña</label>
+                  <input type="password" id="pass-confirmar" required placeholder="Repite la nueva contraseña">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="fas fa-save"></i> Actualizar contraseña
+                </button>
+              </form>
+            </div>
+            <div class="perfil-section-card perfil-danger-card" id="perfil-delete-section">
+              <div class="perfil-section-header" style="color:var(--danger)">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Zona de peligro</h3>
+              </div>
+              <div class="perfil-danger-content">
+                <p>Una vez elimines tu cuenta, no hay vuelta atrás. Todos tus datos, pedidos y reseñas serán eliminados permanentemente.</p>
+                <form onsubmit="eliminarCuenta(event)">
+                  <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Ingresa tu contraseña para confirmar</label>
+                    <input type="password" id="delete-password" required placeholder="Tu contraseña actual">
+                  </div>
+                  <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="fas fa-trash-alt"></i> Eliminar mi cuenta
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ELEMENTOS COMPARTIDOS ============ -->
+
+    <div class="cart-overlay" id="cart-overlay" onclick="cerrarCarritoOverlay(event)">
+      <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+          <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
+          <button class="close-btn" onclick="cerrarCarrito()">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer" id="cart-footer">
+          <div id="free-shipping-bar" class="free-shipping-bar"></div>
+          <div class="cart-total">
+            <span>Total</span>
+            <span id="cart-total">$0</span>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="abrirCheckout()">
+            <i class="fas fa-credit-card"></i> Pagar ahora
+          </button>
+          <button class="btn btn-ghost btn-block" onclick="confirmarVaciarCarrito()">
+            <i class="fas fa-trash"></i> Vaciar carrito
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="checkout-modal" onclick="cerrarModalExterno(event)">
+      <div class="modal-content">
+        <button class="close-btn" onclick="cerrarCheckout()">&times;</button>
+        <div class="modal-header">
+          <i class="fas fa-credit-card"></i>
+          <h2>Finalizar Compra</h2>
+          <p>Completa tus datos para recibir el pedido</p>
+        </div>
+        <form id="checkout-form" onsubmit="procesarPedido(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Nombre completo</label>
+              <input type="text" id="nombre" required placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-phone"></i> Teléfono</label>
+              <input type="tel" id="telefono" required placeholder="Ej: 3001234567">
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-map-marker-alt"></i> Dirección de entrega</label>
+            <textarea id="direccion" required placeholder="Ej: Cra 5 # 20-30, Barrio Centro"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-credit-card"></i> Método de pago</label>
+              <select id="pago">
+                <option value="efectivo">Efectivo contraentrega</option>
+                <option value="nequi">Nequi</option>
+                <option value="daviplata">DaviPlata</option>
+                <option value="bancolombia">Bancolombia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-clock"></i> Horario de entrega</label>
+              <select id="horario">
+                <option value="9-12">9:00am - 12:00pm</option>
+                <option value="12-3">12:00pm - 3:00pm</option>
+                <option value="3-6">3:00pm - 6:00pm</option>
+                <option value="6-8">6:00pm - 8:00pm</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-comment"></i> Instrucciones adicionales</label>
+            <textarea id="instrucciones" placeholder="Ej: Dejar en la portería, tocar timbre..." rows="2"></textarea>
+          </div>
+          <div class="order-summary" id="order-summary"></div>
+          <div style="margin-bottom:12px">
+            <div class="coupon-row">
+              <input type="text" id="cupon-input" placeholder="Código de cupón" maxlength="30">
+              <button type="button" class="btn btn-ghost" onclick="validarCupon()"><i class="fas fa-tag"></i> Aplicar</button>
+            </div>
+            <div id="cupon-mensaje"></div>
+          </div>
+          <button type="submit" class="btn btn-success btn-block btn-lg" id="btn-confirmar">
+            <i class="fas fa-check-circle"></i> Confirmar Pedido
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="success-modal" onclick="cerrarModalExterno(event)">
+      <div class="modal-content modal-success">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Pedido Confirmado</h2>
+        <p>Hemos recibido tu pedido correctamente. Te contactaremos al WhatsApp para coordinar la entrega.</p>
+        <div class="success-details" id="success-details"></div>
+        <button class="btn btn-primary" onclick="cerrarExito()">
+          <i class="fas fa-shopping-bag"></i> Seguir comprando
+        </button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="modal" id="confirm-modal" onclick="cerrarModalExterno(event)">
+      <div class="modal-content modal-confirm">
+        <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h2>¿Confirmar?</h2>
+        <p id="confirm-modal-msg"></p>
+        <div class="confirm-buttons">
+          <button class="btn btn-ghost" onclick="document.getElementById('confirm-modal').classList.remove('open')">Cancelar</button>
+          <button class="btn btn-danger" id="confirm-modal-yes"><i class="fas fa-check"></i> Sí</button>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/573001234567" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

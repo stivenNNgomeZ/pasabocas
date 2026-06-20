@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - SnackZone</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="admin-app">
+    <header id="header">
+      <div class="container header-content">
+        <a href="index.html" class="logo"><i class="fas fa-cookie-bite"></i> SnackZone</a>
+        <nav class="nav-links" id="admin-nav">
+          <a href="#" onclick="cerrarSesionAdmin()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Salir</a>
+          <a href="tienda.html"><i class="fas fa-store"></i> Tienda</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-container">
+      <aside class="admin-sidebar" id="admin-sidebar">
+        <a href="#" class="admin-nav-item active" data-seccion="resumen" onclick="cambiarSeccion('resumen')">
+          <i class="fas fa-chart-pie"></i> Resumen
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="pedidos" onclick="cambiarSeccion('pedidos')">
+          <i class="fas fa-shopping-bag"></i> Pedidos
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="productos" onclick="cambiarSeccion('productos')">
+          <i class="fas fa-box"></i> Productos
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="usuarios" onclick="cambiarSeccion('usuarios')">
+          <i class="fas fa-users"></i> Usuarios
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="contactos" onclick="cambiarSeccion('contactos')">
+          <i class="fas fa-envelope"></i> Mensajes
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="cupones" onclick="cambiarSeccion('cupones')">
+          <i class="fas fa-tags"></i> Cupones
+        </a>
+        <a href="#" class="admin-nav-item" data-seccion="vendedores" onclick="cambiarSeccion('vendedores')">
+          <i class="fas fa-user-check"></i> Vendedores
+        </a>
+        <a href="tienda.html" class="admin-nav-item" style="margin-top:auto;border-top:2px solid var(--light);padding-top:12px">
+          <i class="fas fa-store"></i> Ir a la Tienda
+        </a>
+      </aside>
+
+      <main class="admin-main" id="admin-main">
+        <div id="seccion-resumen" class="admin-seccion active"></div>
+        <div id="seccion-pedidos" class="admin-seccion"></div>
+        <div id="seccion-productos" class="admin-seccion"></div>
+        <div id="seccion-usuarios" class="admin-seccion"></div>
+        <div id="seccion-contactos" class="admin-seccion"></div>
+        <div id="seccion-cupones" class="admin-seccion"></div>
+        <div id="seccion-vendedores" class="admin-seccion"></div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
